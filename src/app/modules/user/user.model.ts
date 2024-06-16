@@ -1,39 +1,45 @@
 import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 import config from "../../config";
-import { TUser } from "./user.interface";
+import { userRole } from "./user.constant";
+import { TUser, UserModel } from "./user.interface";
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser, UserModel>(
   {
-    id: {
+    name: {
       type: String,
-      required: true,
+      required: [true, "Name is required"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
       unique: true,
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
     },
-    needsPasswordChange: {
-      type: Boolean,
-      default: true,
+    phone: {
+      type: String,
+      required: [true, "Phone is required"],
     },
     role: {
       type: String,
-      enum: ["student", "faculty", "admin"],
+      enum: userRole,
     },
-    status: {
+    address: {
       type: String,
-      enum: ["in-progress", "blocked"],
-      default: "in-progress",
-    },
-    isDeleted: {
-      type: Boolean,
-      default: false,
+      required: [true, "Address is required"],
     },
   },
   {
     timestamps: true,
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.password;
+        return ret;
+      },
+    },
   }
 );
 
@@ -47,10 +53,16 @@ userSchema.pre("save", async function (next) {
   );
   next();
 });
-// post save middleware/ hook
-userSchema.post("save", function (doc, next) {
-  doc.password = "";
-  next();
-});
 
-export const UserModel = model<TUser>("user", userSchema);
+userSchema.statics.isUserExistsByEmail = async function (email: string) {
+  return await User.findOne({ email });
+};
+
+userSchema.statics.isPasswordMatched = async function (
+  plainTxtPass: string,
+  hashedPass: string
+) {
+  return await bcrypt.compare(plainTxtPass, hashedPass);
+};
+
+export const User = model<TUser, UserModel>("user", userSchema);

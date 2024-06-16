@@ -1,8 +1,15 @@
+import { Model } from "mongoose";
+
 export type TUser = {
-  id: string;
+  name: string;
+  email: string;
   password: string;
-  needsPasswordChange: boolean;
-  role: "admin" | "student" | "faculty";
-  status: "in-progress" | "blocked";
-  isDeleted: boolean;
+  phone: string;
+  role: "admin" | "user";
+  address: string;
 };
+
+export interface UserModel extends Model<TUser> {
+  isUserExistsByEmail(id: string): Promise<TUser>;
+  isPasswordMatched(plainTxtPass: string, hashedPass: string): Promise<boolean>;
+}
