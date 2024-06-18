@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userRole } from "./user.constant";
+import { userRoleEnum } from "./user.constant";
 const createUserValidationSchema = z.object({
   body: z.object({
     email: z.string().email("Please enter valid email"),
@@ -11,7 +11,7 @@ const createUserValidationSchema = z.object({
       .optional(),
     name: z.string(),
     phone: z.string(),
-    role: z.enum([...userRole] as [string, ...string[]], {
+    role: z.enum([...userRoleEnum] as [string, ...string[]], {
       message: "Invalid gender",
     }),
     address: z.string(),

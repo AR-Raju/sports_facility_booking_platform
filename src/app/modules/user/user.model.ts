@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 import config from "../../config";
-import { userRole } from "./user.constant";
+import { userRoleEnum } from "./user.constant";
 import { TUser, UserModel } from "./user.interface";
 
 const userSchema = new Schema<TUser, UserModel>(
@@ -25,7 +25,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: userRole,
+      enum: userRoleEnum,
     },
     address: {
       type: String,
