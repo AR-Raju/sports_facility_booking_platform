@@ -8,13 +8,15 @@ import catchAsync from "../utils/catchAsync";
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization;
-    if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
         "You are not authorized user!"
       );
     }
+
+    const token = authHeader.split(" ")[1]; // Extract the token after 'Bearer '
 
     jwt.verify(
       token,
@@ -34,6 +36,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
             "You are not authorized user!"
           );
         }
+
+        console.log("decodedValue", decoded);
 
         req.user = decoded as JwtPayload;
         next();

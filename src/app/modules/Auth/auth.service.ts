@@ -6,8 +6,6 @@ import { User } from "../user/user.model";
 import { TLoginUser } from "./auth.interface";
 
 const loginUsers = async (payload: TLoginUser) => {
-  console.log({ payload });
-
   // check if user exists
   if (!(await User.isUserExistsByEmail(payload?.email))) {
     throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
@@ -24,7 +22,7 @@ const loginUsers = async (payload: TLoginUser) => {
 
   // create token and send to the client
   const jwtPayload = {
-    email: user?.id,
+    id: user?._id,
     role: user?.role,
   };
   const accessToken = Jwt.sign(jwtPayload, config.jwt_access_secret as string, {
