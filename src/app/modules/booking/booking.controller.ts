@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
-import AppError from "../../errors/AppError";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { formatDate } from "../../utils/utils";
 import { BookingServices } from "./booking.service";
 
 const createBooking = catchAsync(async (req, res, next) => {
@@ -31,12 +31,10 @@ const getAllBookings = catchAsync(async (req, res, next) => {
 const checkAvailableBooking = catchAsync(async (req, res, next) => {
   const { date } = req.query;
 
-  // Validate that date is a string
-  if (typeof date !== "string") {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid date format");
-  }
+  const _newDate = date ? new Date(date as string) : new Date();
+  const formattedDate = formatDate(_newDate);
 
-  const result = await BookingServices.checkAvailabilityIntoDB(date);
+  const result = await BookingServices.checkAvailabilityIntoDB(formattedDate);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

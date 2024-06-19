@@ -1,7 +1,6 @@
 import httpStatus from "http-status";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
-import { formatDate } from "../../utils/utils";
 import { Facility } from "../facility/facility.model";
 import { BOOKING_STATUS, BookingSearchableFields } from "./booking.constant";
 import { TBooking } from "./booking.interface";
@@ -61,10 +60,7 @@ const getAllBookingsByAdminFromDB = async (query: Record<string, unknown>) => {
 };
 
 const checkAvailabilityIntoDB = async (date: string) => {
-  const _newDate = date ? new Date(date) : new Date();
-  const formattedDate = formatDate(_newDate);
-
-  const resultBookings = await Booking.find({ date: { $eq: formattedDate } });
+  const resultBookings = await Booking.find({ date: { $eq: date } });
 
   const bookings = resultBookings.map((booking) => ({
     startTime: booking.startTime,
