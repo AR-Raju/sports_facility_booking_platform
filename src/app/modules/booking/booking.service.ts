@@ -39,8 +39,6 @@ const createBookingIntoDB = async (id: string, payload: Partial<TBooking>) => {
     modifiedUpdateData["isBooked"] = BOOKING_STATUS.Confirmed;
   }
 
-  console.log(modifiedUpdateData);
-
   const result = await Booking.create(modifiedUpdateData);
   return result;
 };

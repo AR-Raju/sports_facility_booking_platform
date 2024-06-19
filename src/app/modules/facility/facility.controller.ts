@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { checkDataAndRespond } from "../../utils/utils";
 import { FacilityServices } from "./facility.service";
 
 const createFacility = catchAsync(async (req, res, next) => {
@@ -16,6 +17,10 @@ const createFacility = catchAsync(async (req, res, next) => {
 
 const getAllFacilties = catchAsync(async (req, res, next) => {
   const result = await FacilityServices.getAllFacilityFromDB(req.query);
+
+  // Check if data is empty and respond accordingly
+  const noDataResponse = checkDataAndRespond(res, result);
+  if (noDataResponse) return;
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

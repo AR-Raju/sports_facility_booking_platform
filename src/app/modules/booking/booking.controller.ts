@@ -1,11 +1,10 @@
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { formatDate } from "../../utils/utils";
+import { checkDataAndRespond, formatDate } from "../../utils/utils";
 import { BookingServices } from "./booking.service";
 
 const createBooking = catchAsync(async (req, res, next) => {
-  console.log(req.user, "test");
   const { id } = req?.user!;
   const result = await BookingServices.createBookingIntoDB(id, req.body);
 
@@ -36,6 +35,10 @@ const checkAvailableBooking = catchAsync(async (req, res, next) => {
 
   const result = await BookingServices.checkAvailabilityIntoDB(formattedDate);
 
+  // Check if data is empty and respond accordingly
+  const noDataResponse = checkDataAndRespond(res, result);
+  if (noDataResponse) return;
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -46,6 +49,10 @@ const checkAvailableBooking = catchAsync(async (req, res, next) => {
 
 const getAllBookingsByUser = catchAsync(async (req, res, next) => {
   const result = await BookingServices.getAllBookingsByUserFromDB(req.query);
+
+  // Check if data is empty and respond accordingly
+  const noDataResponse = checkDataAndRespond(res, result);
+  if (noDataResponse) return;
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
