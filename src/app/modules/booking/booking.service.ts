@@ -20,7 +20,7 @@ const createBookingIntoDB = async (id: string, payload: Partial<TBooking>) => {
 
   const { pricePerHour } = isFacilityExists;
 
-  let modifiedUpdateData: Record<string, unknown> = { ...payload };
+  const modifiedUpdateData: Record<string, unknown> = { ...payload };
 
   if (endTime && startTime) {
     // Convert startTime and endTime to Date objects
@@ -57,15 +57,39 @@ const getAllBookingsByAdminFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
+const createAllDaySlots = (slotDuration: number) => {
+  const startHour = 0;
+  const endHour = 24;
+  const allSlots = [];
+
+  for (let hour = startHour; hour < endHour; hour += slotDuration) {
+    const startTime = `${hour.toString().padStart(2, "0")}:00`;
+    const endTime = `${(hour + slotDuration).toString().padStart(2, "0")}:00`;
+    allSlots.push({ startTime, endTime });
+  }
+
+  return allSlots;
+};
+
 const checkAvailabilityIntoDB = async (date: string) => {
+  const allSlots = createAllDaySlots(2);
+
   const resultBookings = await Booking.find({ date: { $eq: date } });
 
-  const bookings = resultBookings.map((booking) => ({
+  const bookedSlots = resultBookings.map((booking) => ({
     startTime: booking.startTime,
     endTime: booking.endTime,
   }));
 
-  return bookings;
+  const availableSlots = allSlots.filter((slot) => {
+    return !bookedSlots.some(
+      (bookedSlot) =>
+        slot.startTime === bookedSlot.startTime &&
+        slot.endTime === bookedSlot.endTime
+    );
+  });
+
+  return availableSlots;
 };
 
 const getAllBookingsByUserFromDB = async (query: Record<string, unknown>) => {
